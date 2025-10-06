@@ -26,7 +26,8 @@ jobs:
       - name: Configure AWS credentials (OIDC - POC Account)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ env.ROLE_ARN }}
+          # role-to-assume: ${{ env.ROLE_ARN }}
+          role-to-assume: ROLE_ARN
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
