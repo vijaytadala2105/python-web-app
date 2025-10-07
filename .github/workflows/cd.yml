@@ -1,0 +1,47 @@
+name: CI - Build and Push to ECR (POC)
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main   # Trigger only on pushes to master branch 
+env:
+  AWS_REGION: ${{ secrets.REGION }}
+  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
+  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
+  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+
+permissions:
+  contents: read   # Required for checkout
+
+jobs:
+  deploy:
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux, X64]   # Your AWS Runner labels
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build CDK app
+        run: npm run build
+
+      # Update ECS task definition with the latest ECR image
+      - name: Update ECS Image Tag
+        run: |
+          export ECR_REGISTRY: ${{ env.ECR_REPOSITORY }}
+          export ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
+          export IMAGE_TAG: ${{ github.sha }}
+      - name: Deploy ECS with CDK (Rolling Update)
+        env:
+          CDK_NEW_BOOTSTRAP: 1
+        run: npx cdk deploy --all --require-approval=never
