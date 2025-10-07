@@ -6,11 +6,11 @@ on:
       - 'v*'
     branches:
       - main   # Trigger only on pushes to master branch 
-# env:
-#   AWS_REGION: ${{ secrets.REGION }}
-#   ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
-#   ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
-#   ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+env:
+  AWS_REGION: ${{ secrets.REGION }}
+  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
+  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
+  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
 permissions:
   id-token: write   # Required for OIDC authentication
   contents: read    # Required for actions/checkout
@@ -27,8 +27,8 @@ jobs:
       - name: Configure AWS credentials (OIDC - POC Account)
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.ROLE_ARN }}
-          aws-region: ${{ secrets.REGION }}
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
         id: ecr-login
