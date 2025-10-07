@@ -6,11 +6,11 @@ on:
       - 'v*'
     branches:
       - main   # Trigger only on pushes to master branch 
-env:
-  AWS_REGION: ${{ secrets.REGION }}
-  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
-  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
-  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+# env:
+#   AWS_REGION: ${{ secrets.REGION }}
+#   ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
+#   ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
+#   ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
 permissions:
   id-token: write   # Required for OIDC authentication
   contents: read    # Required for actions/checkout
@@ -18,6 +18,13 @@ permissions:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    environment: secret
+
+    env:
+      AWS_REGION: ${{ secrets.REGION }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPO }}
+      ECR_REPO_NAME: ${{ secrets.ECR_REPO_NAME }}
+      ROLE_ARN: ${{ secrets.ROLE_ARN }}
 
     steps:
       - name: Checkout code
