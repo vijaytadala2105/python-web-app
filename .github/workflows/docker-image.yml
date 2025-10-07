@@ -45,7 +45,7 @@ jobs:
         run: |
           echo "Building Docker image..."
           # docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./Docker
-          docker build -f docker/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -f Docker/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           
           echo "Pushing Docker image to ECR..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
