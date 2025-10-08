@@ -25,6 +25,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        working-directory: ./aws_cdk 
 
       - name: Build CDK App
         run: npm run build
@@ -34,4 +35,5 @@ jobs:
           CDK_NEW_BOOTSTRAP: 1
         run: |
           npx cdk deploy --all --require-approval=never
+
 
