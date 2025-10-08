@@ -37,19 +37,20 @@ jobs:
           sudo npm install -g aws-cdk
           cdk --version
 
-      - name: Set up Python virtual environment
+      - name: Prepare Python Environment
         run: |
           python3 -m venv .venv
           . .venv/bin/activate
-          pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
+          .venv/bin/pip install --upgrade pip setuptools wheel
+          .venv/bin/pip install -r requirements.txt
         working-directory: ./aws_cdk
 
       - name: CDK Deploy
         run: |
-          source .venv/bin/activate
-          cdk deploy --require-approval=never --app "python3 app.py"
+          . .venv/bin/activate
+          cdk deploy --require-approval=never --app ".venv/bin/python app.py"
         working-directory: ./aws_cdk
+
 
 
 
