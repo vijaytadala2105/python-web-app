@@ -29,22 +29,37 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build CDK app
-        run: npm run build
-
-      # Update ECS task definition with the latest ECR image
-      - name: Update ECS Image Tag
+      # Install Node.js (for CDK CLI)
+      - name: Install Node.js and npm
         run: |
-          export ECR_REGISTRY: ${{ env.ECR_REPOSITORY }}
-          export ECR_REPOSITORY: ${{ env.ECR_REPO_NAME }}
-          export IMAGE_TAG: ${{ github.sha }}
-      - name: Deploy ECS with CDK (Rolling Update)
-        env:
-          CDK_NEW_BOOTSTRAP: 1
-        run: npx cdk deploy --all --require-approval=never
+          sudo apt update -y
+          sudo apt install -y nodejs npm
+          node -v
+          npm -v
+
+      # Install AWS CDK globally
+      - name: Install AWS CDK
+        run: |
+          sudo npm install -g aws-cdk
+          cdk --version
+
+      # Install Python dependencies for your CDK app
+      - name: Install Python requirements
+        run: |
+          pip3 install -r requirements.txt
+
+      # CDK synthesize 
+      - name: CDK Synth
+        run: |
+          cdk synth
+        working-directory: ./CDK-AWS   
+
+      # CDK Deploy (rolling update for ECS)
+      - name: CDK Deploy
+        run: |
+          cdk deploy --require-approval=never
+        working-directory: ./aws_cdk
+
 
 
 
