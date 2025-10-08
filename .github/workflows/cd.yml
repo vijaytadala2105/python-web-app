@@ -35,15 +35,13 @@ jobs:
 
       - name: CDK Synth
         run: |
-          source .venv/bin/activate
-          cdk synth --app "python app.py"
-        working-directory: .
+          cdk synth 
+        working-directory: ./aws_cdk 
               
       - name: CDK Deploy
         run: |
-          source .venv/bin/activate
           cdk deploy --require-approval=never
-        working-directory: .
-        
+        working-directory: ./aws_cdk
+
 
 
