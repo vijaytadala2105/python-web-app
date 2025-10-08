@@ -5,7 +5,7 @@ on:
     tags:
       - 'v*'
     branches:
-      - main   # Trigger only on pushes to master branch 
+      - main   # Trigger only on pushes to master branch
 env:
   AWS_REGION: ${{ secrets.REGION }}
   ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
@@ -45,4 +45,5 @@ jobs:
         env:
           CDK_NEW_BOOTSTRAP: 1
         run: npx cdk deploy --all --require-approval=never
+
 
