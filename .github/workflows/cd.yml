@@ -46,7 +46,7 @@ jobs:
       # Install Python dependencies for your CDK app
       - name: Install Python requirements
         run: |
-          pip3 install -r requirements.txt
+          pip install -r requirements.txt
 
       # CDK synthesize 
       - name: CDK Synth
@@ -59,6 +59,7 @@ jobs:
         run: |
           cdk deploy --require-approval=never
         working-directory: ./aws_cdk
+
 
 
 
