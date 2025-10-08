@@ -41,13 +41,7 @@ jobs:
       - name: Install AWS CDK
         run: |
           sudo npm install -g aws-cdk
-          cdk --version
-      
-      # CDK synthesize 
-      - name: CDK Synth
-        run: |
-          cdk synth
-        # working-directory: ./aws_cdk   
+          cdk --version  
 
       # CDK Deploy (rolling update for ECS)
       - name: CDK Deploy
