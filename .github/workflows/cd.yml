@@ -1,83 +1,37 @@
-name: CD - Deploy to ECS via CDK (POC)
+name: Deploy AWS CDK
 
+# Controls when the action will run. 
 on:
   push:
-    tags:
-      - 'v*'
-    branches:
-      - main   # Trigger only on pushes to master branch
-env:
-  AWS_REGION: ${{ secrets.REGION }}
-  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
-  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
-  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+    branches: [ master ]
+  #pull_request:
+    #branches: [ main ]
 
-permissions:
-  contents: read   # Required for checkout
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  deploy:
-    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    runs-on: [self-hosted, linux, X64]   # Your AWS Runner labels
-
+  aws_cdk:
+    runs-on: [self-hosted, linux, X64]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: install npm
+        run: 'sudo apt update -y && sudo apt install nodejs npm -y'
 
-      # Install Node.js (for CDK CLI)
-      - name: Install Node.js and npm
-        run: |
-          sudo apt update -y
-          sudo apt install -y nodejs npm
-          node -v
-          npm -v
-
-      # Install AWS CDK globally
       - name: Install AWS CDK
-        run: |
-          sudo npm install -g aws-cdk
-          cdk --version
+        run: 'sudo npm install -g aws-cdk' 
 
-      - name: Install Python3 and pip
-        run: |
-          sudo apt update -y
-          sudo apt install -y python3 python3-venv python3-pip
-          python3 --version
-          pip3 --version
+      - name: Install Requirements 
+        run: 'pip3 install -r requirements.txt'
+        working-directory: .
 
-      - name: Setup Python virtual environment
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements.txt
-        working-directory: ./aws_cdk 
-
-      # Install Python dependencies for your CDK app
-      - name: Install Python requirements
-        run: |
-          pip3 install -r requirements.txt
-          working-directory: ./aws_cdk 
-
-      # CDK synthesize 
       - name: CDK Synth
-        run: |
-          cdk synth
-        working-directory: ./aws_cdk   
-
-      # CDK Deploy (rolling update for ECS)
+        run: cdk synth
+        working-directory: .
+              
       - name: CDK Deploy
-        run: |
-          cdk deploy --require-approval=never
-        working-directory: ./aws_cdk
-
-
-
-
-
-
+        run: cdk deploy --require-approval never
+        working-directory: .
+        
