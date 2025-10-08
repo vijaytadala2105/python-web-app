@@ -1,4 +1,4 @@
-name: CI - Build and Push to ECR (POC)
+name: CI - CDK DEPLOY (POC)
 
 on:
   push:
@@ -45,5 +45,6 @@ jobs:
         env:
           CDK_NEW_BOOTSTRAP: 1
         run: npx cdk deploy --all --require-approval=never
+
 
 
