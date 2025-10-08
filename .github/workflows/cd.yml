@@ -18,37 +18,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      # Install Node.js (for CDK CLI)
-      - name: Install Node.js and npm
+      # 2️⃣ Install prerequisites (Node + Python + build tools)
+      - name: Install base dependencies
         run: |
           sudo apt update -y
-          sudo apt install -y nodejs npm
+          sudo apt install -y nodejs npm python3 python3-pip python3-venv \
+                              build-essential libssl-dev libffi-dev python3-dev jq
           node -v
-          npm -v
+          python3 --version
 
-      # Install AWS CDK globally
+      # 3️⃣ Install AWS CDK CLI globally (for synth/deploy)
       - name: Install AWS CDK
         run: |
           sudo npm install -g aws-cdk
           cdk --version
 
-      - name: Prepare Python Environment
+      # 4️⃣ Cache pip packages to speed up installs
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      # 5️⃣ Create and activate Python virtual environment
+      - name: Setup Python virtual environment
         run: |
           python3 -m venv .venv
-          . .venv/bin/activate
-          .venv/bin/pip install --upgrade pip setuptools wheel
-          .venv/bin/pip install -r requirements.txt
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel setuptools
+          pip install -r requirements.txt --timeout 600
+        working-directory: ./aws_cdk     # ⬅️ adjust to your CDK app folder
+
+      # 7️⃣ Synthesize CDK stack (generate CloudFormation template)
+      - name: CDK Synth
+        run: |
+          source .venv/bin/activate
+          cdk synth
         working-directory: ./aws_cdk
 
+      # 8️⃣ Deploy CDK stack (ECS Rolling Update)
       - name: CDK Deploy
+        env:
+          AWS_REGION: us-east-1
         run: |
-          . .venv/bin/activate
-          cdk deploy --require-approval=never --app ".venv/bin/python app.py"
+          source .venv/bin/activate
+          cdk deploy --require-approval=never
         working-directory: ./aws_cdk
 
 
