@@ -23,15 +23,26 @@ jobs:
       - name: Install AWS CDK
         run: 'sudo npm install -g aws-cdk' 
 
-      - name: Install Requirements 
-        run: 'pip3 install -r requirements.txt'
+      - name: Install Python & Create Virtual Env
+        run: |
+          sudo apt update -y
+          sudo apt install -y python3 python3-venv python3-pip
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python -m pip install --upgrade pip wheel setuptools
+          pip install -r requirements.txt
         working-directory: .
 
       - name: CDK Synth
-        run: cdk synth
+        run: |
+          source .venv/bin/activate
+          cdk synth
         working-directory: .
               
       - name: CDK Deploy
-        run: cdk deploy --require-approval never
+        run: |
+          source .venv/bin/activate
+          cdk deploy --require-approval=never
         working-directory: .
         
+
