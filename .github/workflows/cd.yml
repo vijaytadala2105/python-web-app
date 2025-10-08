@@ -24,7 +24,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build CDK App
         run: npm run build
@@ -34,3 +34,4 @@ jobs:
           CDK_NEW_BOOTSTRAP: 1
         run: |
           npx cdk deploy --all --require-approval=never
+
