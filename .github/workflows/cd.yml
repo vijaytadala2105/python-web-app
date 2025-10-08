@@ -37,11 +37,12 @@ jobs:
           sudo npm install -g aws-cdk
           cdk --version
 
-      - name: Deploy ECS with CDK (Rolling Update)
-        env:
-          CDK_NEW_BOOTSTRAP: 1
+     # CDK Deploy (rolling update for ECS)
+      - name: CDK Deploy
         run: |
-          npx cdk deploy --all --require-approval=never
+          cdk deploy --require-approval=never
+        working-directory: ./aws_cdk
+
 
 
 
