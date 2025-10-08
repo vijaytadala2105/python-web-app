@@ -2,74 +2,79 @@ name: CD - Deploy to ECS via CDK (POC)
 
 on:
   push:
+    tags:
+      - 'v*'
     branches:
-      - master   # Deploy on pushes to master
-  workflow_dispatch:  # Allow manual trigger from GitHub UI
+      - main   # Trigger only on pushes to master branch
+env:
+  AWS_REGION: ${{ secrets.REGION }}
+  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
+  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
+  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
 
 permissions:
-  contents: read    # Checkout code
+  contents: read   # Required for checkout
 
 jobs:
   deploy:
-    # If you run in a self-hosted AWS runner, replace with:
-    runs-on: [self-hosted, linux, X64]
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, linux, X64]   # Your AWS Runner labels
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Install prerequisites (Node + Python + build tools)
-      - name: Install base dependencies
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Install Node.js (for CDK CLI)
+      - name: Install Node.js and npm
         run: |
           sudo apt update -y
-          sudo apt install -y nodejs npm python3 python3-pip python3-venv \
-                              build-essential libssl-dev libffi-dev python3-dev jq
+          sudo apt install -y nodejs npm
           node -v
-          python3 --version
+          npm -v
 
-      # 3️⃣ Install AWS CDK CLI globally (for synth/deploy)
+      # Install AWS CDK globally
       - name: Install AWS CDK
         run: |
           sudo npm install -g aws-cdk
           cdk --version
 
-      # 4️⃣ Cache pip packages to speed up installs
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+      - name: Install Python3 and pip
+        run: |
+          sudo apt update -y
+          sudo apt install -y python3 python3-venv python3-pip
+          python3 --version
+          pip3 --version
 
-      # 5️⃣ Create and activate Python virtual environment
       - name: Setup Python virtual environment
         run: |
           python3 -m venv .venv
           source .venv/bin/activate
-          python -m pip install --upgrade pip wheel setuptools
-          pip install -r requirements.txt --timeout 600
-        working-directory: ./aws_cdk     # ⬅️ adjust to your CDK app folder
+          pip install --upgrade pip
+          pip install -r requirements.txt
+        working-directory: ./aws_cdk 
 
-      # 7️⃣ Synthesize CDK stack (generate CloudFormation template)
+      # Install Python dependencies for your CDK app
+      - name: Install Python requirements
+        run: |
+          pip3 install -r requirements.txt
+          working-directory: ./aws_cdk 
+
+      # CDK synthesize 
       - name: CDK Synth
         run: |
-          source .venv/bin/activate
           cdk synth
-        working-directory: ./aws_cdk
+        working-directory: ./aws_cdk   
 
-      # 8️⃣ Deploy CDK stack (ECS Rolling Update)
+      # CDK Deploy (rolling update for ECS)
       - name: CDK Deploy
-        env:
-          AWS_REGION: us-east-1
         run: |
-          source .venv/bin/activate
           cdk deploy --require-approval=never
         working-directory: ./aws_cdk
-
-
-
-
 
 
 
