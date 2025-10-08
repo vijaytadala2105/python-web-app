@@ -5,12 +5,7 @@ on:
     tags:
       - 'v*'
     branches:
-      - main   # Trigger only on pushes to master branch
-env:
-  AWS_REGION: ${{ secrets.REGION }}
-  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
-  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
-  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+      - main   # Trigger only on pushes to master branch 
 
 permissions:
   contents: read   # Required for checkout
@@ -43,22 +38,31 @@ jobs:
           sudo npm install -g aws-cdk
           cdk --version
 
+      - name: Install Python3 and pip
+        run: |
+          sudo apt update -y
+          sudo apt install -y python3 python3-pip
+          python3 --version
+          pip3 --version
+
       # Install Python dependencies for your CDK app
       - name: Install Python requirements
         run: |
-          pip install -r requirements.txt
+          pip3 install -r requirements.txt
+          working-directory: ./aws_cdk 
 
       # CDK synthesize 
       - name: CDK Synth
         run: |
           cdk synth
-        working-directory: ./CDK-AWS   
+        working-directory: ./aws_cdk   
 
       # CDK Deploy (rolling update for ECS)
       - name: CDK Deploy
         run: |
           cdk deploy --require-approval=never
         working-directory: ./aws_cdk
+
 
 
 
