@@ -23,17 +23,25 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./aws_cdk 
+      # Install Node.js (for CDK CLI)
+      - name: Install Node.js and npm
+        run: |
+          sudo apt update -y
+          sudo apt install -y nodejs npm
+          node -v
+          npm -v
 
-      - name: Build CDK App
-        run: npm run build
+      # Install AWS CDK globally
+      - name: Install AWS CDK
+        run: |
+          sudo npm install -g aws-cdk
+          cdk --version
 
       - name: Deploy ECS with CDK (Rolling Update)
         env:
           CDK_NEW_BOOTSTRAP: 1
         run: |
           npx cdk deploy --all --require-approval=never
+
 
 
