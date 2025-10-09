@@ -5,7 +5,7 @@ on:
     tags:
       - 'v*'
     branches:
-      - main   # Trigger only on pushes to master branc
+      - main   # Trigger only on pushes to master branch
 
 permissions:
   contents: read    # Required for actions/checkout
