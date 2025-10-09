@@ -36,7 +36,7 @@ jobs:
       - name: CDK Synth
         run: |
           cdk synth 
-        working-directory: ./aws_cdk 
+        working-directory: ./aws_cdk
               
       - name: CDK Deploy
         run: |
