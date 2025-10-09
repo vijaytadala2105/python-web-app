@@ -5,12 +5,12 @@ on:
     tags:
       - 'v*'
     branches:
-      - main   # Trigger only on pushes to master branch 
+      - main   # Trigger only on pushes to master branch
 env:
   AWS_REGION: ${{ secrets.REGION }}
-  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}  
-  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}  
-  ROLE_ARN:  ${{ secrets.ROLE_ARN }}  
+  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}
+  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}
+  ROLE_ARN:  ${{ secrets.ROLE_ARN }}
 permissions:
   id-token: write   # Required for OIDC authentication
   contents: read    # Required for actions/checkout
@@ -32,11 +32,11 @@ jobs:
       - name: Login to Amazon ECR
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
-        
+
       - name: Extract tag
         id: version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          
+
       - name: Build, tag, and push Docker image to ECR (POC)
         env:
           ECR_REGISTRY: ${{ env.ECR_REPOSITORY }}
@@ -46,7 +46,7 @@ jobs:
           echo "Building Docker image..."
           # docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./Docker
           docker build -f Docker/Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          
+
           echo "Pushing Docker image to ECR..."
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
