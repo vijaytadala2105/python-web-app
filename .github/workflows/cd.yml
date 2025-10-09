@@ -1,6 +1,6 @@
 name: Deploy AWS CDK
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   push:
     branches: [ main ]
@@ -21,7 +21,7 @@ jobs:
         run: 'sudo apt update -y && sudo apt install nodejs npm -y'
 
       - name: Install AWS CDK
-        run: 'sudo npm install -g aws-cdk' 
+        run: 'sudo npm install -g aws-cdk'
 
       - name: Install Python & Create Virtual Env
         run: |
@@ -35,13 +35,13 @@ jobs:
 
       - name: CDK Synth
         run: |
-          cdk synth 
-        working-directory: ./aws_cdk
-              
+          cdk synth
+        working-directory: ./cd
+
       - name: CDK Deploy
         run: |
           cdk deploy --require-approval=never
-        working-directory: ./aws_cdk
+        working-directory: ./cd
 
 
 
