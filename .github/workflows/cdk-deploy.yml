@@ -1,16 +1,17 @@
 name: CD - Deploy ECS Cluster (POC)
 
 on:
-  workflow_run:
-    # workflows: ["CI - Build and Push to ECR (POC)"]
-    # types: [completed]
-  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - main   # Trigger only on pushes to master branch
 
 permissions:
-  contents: read
+  contents: read    # Required for actions/checkout
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: [self-hosted, linux, X64]
 
     steps:
