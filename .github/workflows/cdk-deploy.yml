@@ -40,17 +40,17 @@ jobs:
       - name: Test CDK App Entry Point
         run: .venv/bin/python app.py
         working-directory: ./ecs_stack
-      - name: CDK Synth
-        run: |
-          # cdk synth
-          .venv/bin/cdk synth
-        working-directory: ./ecs_stack
+      # - name: CDK Synth
+      #   run: |
+      #     # cdk synth
+      #     .venv/bin/cdk synth
+      #   working-directory: ./ecs_stack
 
       - name: CDK Deploy
         run: |
           cdk deploy --require-approval=never
           # .venv/bin/cdk deploy --require-approval=never
-        working-directory: ./ecs_stack
+        # working-directory: ./ecs_stack
 
 
 
