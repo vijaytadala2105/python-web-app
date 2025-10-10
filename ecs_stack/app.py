@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 
-import aws_cdk as cdk
+import aws_cdk_lib as cdk
 
 from ecs_stack.ecs_stack_stack import EcsStackStack
 
