@@ -38,7 +38,8 @@ jobs:
 
       - name: CDK Synth
         working-directory: ./ecs_stack
-        run: cdk synth --app "python3 app.py"
+        # run: cdk synth --app "python3 app.py"
+        run: .venv/bin/python -m aws_cdk.cli synth
 
       - name: CDK Deploy
         working-directory: ./ecs_stack
