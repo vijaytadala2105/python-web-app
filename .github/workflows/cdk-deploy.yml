@@ -5,52 +5,41 @@ on:
     tags:
       - 'v*'
     branches:
-      - main   # Trigger only on pushes to master branch 
+      - main
 
 permissions:
-  contents: read    # Required for actions/checkout
+  contents: read
 
 jobs:
-  build-and-push:
-    # runs-on: [self-hosted, linux, X64]
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout source code
         uses: actions/checkout@v2
 
-      - name: install npm
-        run: 'sudo apt update -y && sudo apt install nodejs npm -y'
-
-      - name: Install AWS CDK
-        run: 'sudo npm install -g aws-cdk'
-
-      - name: Install Python & Create Virtual Env
+      - name: Install Node.js and AWS CDK CLI
         run: |
           sudo apt update -y
+          sudo apt install -y nodejs npm
+          sudo npm install -g aws-cdk
+
+      - name: Set up Python and install dependencies
+        working-directory: ./ecs_stack
+        run: |
           sudo apt install -y python3 python3-venv python3-pip
           python3 -m venv .venv
-          # source .venv/bin/activate
-          # python -m pip install --upgrade pip wheel setuptools
-          # pip install -r requirements.txt
-          # pip install -r ecs_stack/requirements.txt
           .venv/bin/python -m pip install --upgrade pip wheel setuptools
           .venv/bin/pip install -r requirements.txt
-        working-directory: ./ecs_stack
+
       - name: Test CDK App Entry Point
-        run: .venv/bin/python app.py
         working-directory: ./ecs_stack
-      # - name: CDK Synth
-      #   run: |
-      #     # cdk synth
-      #     .venv/bin/cdk synth
-      #   working-directory: ./ecs_stack
+        run: .venv/bin/python app.py
+
+      - name: CDK Synth
+        working-directory: ./ecs_stack
+        run: cdk synth --app "python3 app.py"
 
       - name: CDK Deploy
-        run: |
-          cdk deploy --require-approval=never
-          # .venv/bin/cdk deploy --require-approval=never --app "python3 app.py"
-        # working-directory: ./ecs_stack
-
-
-
+        working-directory: ./ecs_stack
+        run: cdk deploy --require-approval=never --app "python3 app.py"
