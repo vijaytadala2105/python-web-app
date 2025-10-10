@@ -31,9 +31,11 @@ jobs:
           sudo apt install -y python3 python3-venv python3-pip
           python3 -m venv .venv
           source .venv/bin/activate
-          python -m pip install --upgrade pip wheel setuptools
+          # python -m pip install --upgrade pip wheel setuptools
           # pip install -r requirements.txt
-          pip install -r ecs_stack/requirements.txt
+          # pip install -r ecs_stack/requirements.txt
+          .venv/bin/python -m pip install --upgrade pip wheel setuptools
+          .venv/bin/pip install -r ecs_stack/requirements.txt
         working-directory: .
 
       - name: CDK Synth
