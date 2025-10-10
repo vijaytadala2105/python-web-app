@@ -1,4 +1,4 @@
-_name: CD - Deploy ECS Cluster (POC)
+name: CD - Deploy ECS Cluster (POC)
 
 on:
   push:
