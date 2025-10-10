@@ -6,9 +6,17 @@ on:
       - 'v*'
     branches:
       - main
-
+env:
+  AWS_REGION: ${{ secrets.REGION }}
+  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}
+  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}
+  ROLE_ARN:  ${{ secrets.ROLE_ARN }}
 permissions:
-  contents: read
+  id-token: write   # Required for OIDC authentication
+  contents: read 
+
+# permissions:
+#   contents: read
 
 jobs:
   build-and-deploy:
@@ -17,6 +25,12 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
+
+      - name: Configure AWS credentials (OIDC - POC Account)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ env.ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Install Node.js and AWS CDK CLI
         run: |
