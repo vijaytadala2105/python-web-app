@@ -36,7 +36,7 @@ jobs:
           # pip install -r ecs_stack/requirements.txt
           .venv/bin/python -m pip install --upgrade pip wheel setuptools
           .venv/bin/pip install -r ecs_stack/requirements.txt
-        working-directory: .
+        working-directory: ./ecs_stack
 
       - name: CDK Synth
         run: |
