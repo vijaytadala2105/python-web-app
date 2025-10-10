@@ -12,7 +12,8 @@ permissions:
 
 jobs:
   build-and-push:
-    runs-on: [self-hosted, linux, X64]
+    # runs-on: [self-hosted, linux, X64]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
