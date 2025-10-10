@@ -6,50 +6,23 @@ on:
       - 'v*'
     branches:
       - main
-env:
-  AWS_REGION: ${{ secrets.REGION }}
-  ECR_REPOSITORY:  ${{ secrets.ECR_REPO }}
-  ECR_REPO_NAME:  ${{ secrets.ECR_REPO_NAME }}
-  ROLE_ARN:  ${{ secrets.ROLE_ARN }}
 permissions:
-  # id-token: write   # Required for OIDC authentication
   contents: read 
-
-# permissions:
-#   contents: read
 
 jobs:
   build-and-deploy:
     runs-on: [self-hosted, linux, X64]
-    # runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
 
-      # - name: Configure AWS credentials (OIDC - POC Account)
-      #   uses: aws-actions/configure-aws-credentials@v2
-      #   with:
-      #     role-to-assume: ${{ env.ROLE_ARN }}
-      #     aws-region: ${{ env.AWS_REGION }}
-
-      - name: Install Node.js
+      - name: Install Node.js and aws cdk
         run: |
           sudo apt update -y
           sudo apt install -y nodejs npm
-          
-      - name: Install AWS CDK CLI
-        run: |
           sudo npm install -g aws-cdk
       
-
-      # - name: Set up Python and install dependencies
-      #   working-directory: ./ecs_stack
-      #   run: |
-      #     sudo apt install -y python3 python3-venv python3-pip
-      #     python3 -m venv .venv
-      #     .venv/bin/python -m pip install --upgrade pip wheel setuptools
-      #     .venv/bin/pip install -r requirements.txt
       - name: Set up Python and install dependencies
         working-directory: ./ecs_stack
         run: |
@@ -58,7 +31,6 @@ jobs:
           python3 -m venv .venv
           .venv/bin/python -m pip install --upgrade pip wheel setuptools
           .venv/bin/pip install -r requirements.txt
-
 
       - name: Test CDK App Entry Point
         working-directory: ./ecs_stack
