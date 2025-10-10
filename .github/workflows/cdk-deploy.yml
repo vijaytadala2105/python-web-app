@@ -1,6 +1,7 @@
 name: CD - Deploy ECS Cluster (POC)
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
