@@ -49,7 +49,7 @@ jobs:
       - name: CDK Deploy
         run: |
           cdk deploy --require-approval=never
-          # .venv/bin/cdk deploy --require-approval=never
+          # .venv/bin/cdk deploy --require-approval=never --app "python3 app.py"
         # working-directory: ./ecs_stack
 
 
