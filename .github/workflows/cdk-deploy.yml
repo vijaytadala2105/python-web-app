@@ -42,7 +42,8 @@ jobs:
         working-directory: ./ecs_stack
       - name: CDK Synth
         run: |
-          cdk synth
+          # cdk synth
+          .venv/bin/cdk synth
         working-directory: ./ecs_stack
 
       - name: CDK Deploy
