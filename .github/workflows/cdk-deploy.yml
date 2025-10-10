@@ -1,4 +1,4 @@
-name: CD - Deploy ECS Cluster (POC)
+_name: CD - Deploy ECS Cluster (POC)
 
 on:
   push:
@@ -32,7 +32,8 @@ jobs:
           python3 -m venv .venv
           source .venv/bin/activate
           python -m pip install --upgrade pip wheel setuptools
-          pip install -r requirements.txt
+          # pip install -r requirements.txt
+          pip install -r ecs_stack/requirements.txt
         working-directory: .
 
       - name: CDK Synth
