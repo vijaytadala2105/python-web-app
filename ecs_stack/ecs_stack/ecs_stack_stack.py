@@ -45,6 +45,34 @@ class EcsStackStack(Stack):
         repo = ecr.Repository.from_repository_name(self, "PRIVATEREPO", "poc")
         image=ecs.ContainerImage.from_ecr_repository(repo, tag="latest")
 
+        # Security Group for Fargate Tasks
+        fargate_sg = ec2.SecurityGroup(self, "FargateSG",
+            vpc=vpc,
+            description="Security group for ECS Fargate tasks",
+            allow_all_outbound=True
+        )
+        
+        # Security Group for Load Balancer
+        alb_sg = ec2.SecurityGroup(self, "ALBSG",
+            vpc=vpc,
+            description="Security group for ALB",
+            allow_all_outbound=True
+        )
+        
+        # Allow ALB to talk to Fargate tasks on container port
+        fargate_sg.add_ingress_rule(
+            peer=alb_sg,
+            connection=ec2.Port.tcp(8000),
+            description="Allow ALB to reach Fargate container"
+        )
+        
+        # Allow public HTTP access to ALB (port 80)
+        alb_sg.add_ingress_rule(
+            peer=ec2.Peer.any_ipv4(),
+            connection=ec2.Port.tcp(80),
+            description="Allow public HTTP traffic to ALB"
+        )
+
 
         service = ecs_patterns.ApplicationLoadBalancedFargateService(
             self,
@@ -57,6 +85,7 @@ class EcsStackStack(Stack):
             task_subnets=ec2.SubnetSelection(
                 subnet_type=ec2.SubnetType.PRIVATE_WITH_NAT
             ),
+            security_groups=[fargate_sg],
             task_image_options=ecs_patterns.ApplicationLoadBalancedTaskImageOptions(
                 image=image,
                 container_port=8000,
@@ -67,6 +96,8 @@ class EcsStackStack(Stack):
         service.service.deployment_controller = ecs.DeploymentController(
             type=ecs.DeploymentControllerType.ECS
         )
+        service.load_balancer.connections.security_groups.clear()
+        service.load_balancer.connections.security_groups.append(alb_sg)
 
 
         Tags.of(service).add("Project", "MyProject")
